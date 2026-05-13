@@ -36,6 +36,21 @@ rl_lob_project/
 
 ---
 
+## Attribution and Implementation Overview
+
+The file `market/BSE.py` is based on Dave Cliff's Bristol Stock Exchange (BSE) simulator.
+
+The surrounding integration code, including `bse_market.py`, `trading_env.py`, state representations, experiment scripts and evaluation utilities, was developed for this coursework project.
+
+BSE repository: https://github.com/davecliff/BristolStockExchange
+
+The figure below summarises how the original BSE components are integrated into this project. The original BSE matching engine, public LOB and ZIC/ZIP background traders are used through the `BSEMarket` wrapper. The reinforcement-learning interface, state construction, reward calculation, accounting logic, PPO integration and experiment code are implemented around this BSE layer.
+
+![Implementation structure](figures/implementation_structure.png)
+
+
+---
+
 ## Installation
 
 ```bash
@@ -47,11 +62,6 @@ pip install -r requirements.txt
 ---
 
 ## Usage
-
-### Quick smoke test (fast — for debugging)
-```bash
-python smoke_test.py
-```
 
 ### Run all three experiments
 ```bash
@@ -67,25 +77,38 @@ python main.py --exp 2     # Representation method comparison
 python main.py --exp 3     # PPO agents vs non-learning baselines
 ```
 
-### Custom settings
+### Custom settings and quick checks
+
+The experiment scripts support custom run counts, training steps and evaluation episodes. For example, to run all experiments with custom settings:
+
 ```bash
 python main.py --all --n_runs 5 --n_steps 500000 --n_eval 50
+```
 
-# Experiment 3 with a specific best config from Exp 1/2
+For a quick code-structure check, use a much smaller setting:
+
+```bash
+python main.py --exp 1 --n_runs 1 --n_steps 10000 --n_eval 5
+```
+
+Experiment 3 can also be run with a specific PPO state representation:
+
+```bash
 python main.py --exp 3 --best_state_type handcrafted
 ```
 
 `Experiment 3` currently supports only `handcrafted`, `best_bidask`, or the default `both`.
 
-### Save a representative Experiment 3 handcrafted model
-```bash
-python save_exp3_handcrafted_model.py
-```
+The full formal experiments can take a long time because each configuration is trained over multiple independent runs. The reported coursework results were generated using the formal experiment settings described in the report.
 
-This trains a single representative `RL(handcrafted)` model using the fixed seed `42` under the formal Experiment 3 configuration and saves it to:
+### Representative saved model
+
+The submitted outputs include a representative trained `RL(handcrafted)` model from Experiment 3 using seed `42`:
 
 - `outputs/experiment3/models/rl_handcrafted_seed42.zip`
 - `outputs/experiment3/models/rl_handcrafted_seed42.txt`
+
+These files are provided as example saved model outputs. The formal experimental results reported in the report are based on the multi-run evaluation procedure, not on this single representative model alone.
 
 ---
 
