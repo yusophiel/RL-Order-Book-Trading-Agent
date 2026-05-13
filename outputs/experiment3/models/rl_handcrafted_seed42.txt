@@ -1,0 +1,5 @@
+Representative RL(handcrafted) model from Exp3
+seed=42
+mean_eval_total_pnl=861.594555
+n_eval=100
+n_steps=800000

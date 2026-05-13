@@ -1,0 +1,21 @@
+=== Experiment 3 Results ===
+Config                             total_pnl          sharpe_ratio          max_drawdown    inventory_variance     transaction_costs       trade_frequency
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+RL (handcrafted)             762.40 ± 353.93           0.34 ± 0.22        777.64 ± 86.37         19.30 ± 11.15           7.19 ± 2.49           0.07 ± 0.03
+RL (best_bidask)             455.70 ± 476.69           0.19 ± 0.22       861.88 ± 103.42         18.17 ± 17.07           4.10 ± 2.72           0.04 ± 0.03
+Random quoting baseline        -37.48 ± 20.99          -0.04 ± 0.02        518.90 ± 10.32          10.30 ± 0.63           9.21 ± 0.05           0.09 ± 0.00
+Adaptive quoting baseline        -90.31 ± 19.94          -0.09 ± 0.02        529.87 ± 11.31           8.05 ± 0.34           7.23 ± 0.06           0.07 ± 0.00
+Rule-based                      0.16 ± 21.85          -0.00 ± 0.03        398.96 ± 11.12           6.20 ± 0.28          11.37 ± 0.07           0.12 ± 0.00
+
+--- Paired t-tests vs RL (handcrafted) ---
+  RL (handcrafted) vs Random quoting baseline: p=0.0000  ✓ significant
+  RL (handcrafted) vs Adaptive quoting baseline: p=0.0000  ✓ significant
+  RL (handcrafted) vs Rule-based: p=0.0000  ✓ significant
+
+--- Paired t-tests vs RL (best_bidask) ---
+  RL (best_bidask) vs Random quoting baseline: p=0.0003  ✓ significant
+  RL (best_bidask) vs Adaptive quoting baseline: p=0.0001  ✓ significant
+  RL (best_bidask) vs Rule-based: p=0.0005  ✓ significant
+
+--- Paired t-test: RL (handcrafted) vs RL (best_bidask) ---
+  RL (handcrafted) vs RL (best_bidask): p=0.0356  ✓ significant

@@ -1,0 +1,21 @@
+=== Experiment 1 Results ===
+Config                             total_pnl          sharpe_ratio          max_drawdown    inventory_variance     transaction_costs       trade_frequency
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+price_only                  -312.15 ± 110.11          -0.09 ± 0.03      1093.68 ± 364.69           1.77 ± 0.60           2.05 ± 0.68           0.01 ± 0.00
+best_bidask                   15.80 ± 268.08           0.01 ± 0.09      1024.21 ± 344.43           5.65 ± 3.87           3.60 ± 1.87           0.03 ± 0.02
+raw_lob                      -35.00 ± 443.13           0.01 ± 0.17      1131.59 ± 149.05           4.15 ± 3.65           4.38 ± 3.33           0.03 ± 0.03
+
+--- Welch t-tests (PnL) ---
+  price_only vs best_bidask: p=0.0053  ✓ significant
+  best_bidask vs raw_lob: p=0.7726  ✗ not significant
+  price_only vs raw_lob: p=0.0983  ✗ not significant
+
+--- Welch t-tests (Sharpe) ---
+  price_only vs best_bidask: p=0.0061  ✓ significant
+  best_bidask vs raw_lob: p=0.9880  ✗ not significant
+  price_only vs raw_lob: p=0.1128  ✗ not significant
+
+--- Welch t-tests (Max Drawdown) ---
+  price_only vs best_bidask: p=0.6828  ✗ not significant
+  best_bidask vs raw_lob: p=0.4072  ✗ not significant
+  price_only vs raw_lob: p=0.7778  ✗ not significant
