@@ -22,11 +22,19 @@ The project focuses on whether richer market information necessarily improves tr
 | Best Bid/Ask | **15.80** | 0.01 |
 | Raw LOB | -35.00 | 0.01 |
 
-Best bid/ask significantly outperformed price-only observations in both total PnL (**p = 0.0053**) and Sharpe ratio (**p = 0.0061**), while deeper raw LOB information did not provide a statistically significant improvement over top-of-book information.
+Best bid/ask significantly outperformed price-only observations in both Total PnL (**p = 0.0053**) and Sharpe ratio (**p = 0.0061**). Raw LOB depth did not provide a statistically significant improvement over the simpler best-bid/ask representation.
 
 ### Experiment 2 — LOB Representation
 
-The **handcrafted microstructure representation** achieved the highest mean Total PnL (**270.02**) and Sharpe ratio (**0.12**).
+| State | Mean Total PnL | Sharpe |
+|:--|--:|--:|
+| Handcrafted | **270.02** | **0.12** |
+| MLP Encoder | -201.67 | -0.06 |
+| CNN Encoder | -339.09 | -0.10 |
+| Autoencoder | -241.18 | -0.07 |
+| Best Bid/Ask | 15.80 | 0.01 |
+
+The **handcrafted microstructure representation** achieved the highest mean Total PnL and Sharpe ratio.
 
 It significantly outperformed all three learned encoder representations in Total PnL:
 
@@ -34,7 +42,7 @@ It significantly outperformed all three learned encoder representations in Total
 - CNN encoder: **p = 0.0002**
 - Autoencoder: **p = 0.0005**
 
-The advantage over best bid/ask was larger in mean PnL but was not statistically significant in this experiment (**p = 0.0745**).
+Although handcrafted achieved a substantially higher mean PnL than best bid/ask (**270.02 vs. 15.80**), the difference was not statistically significant in this experiment (**p = 0.0745**).
 
 ### Experiment 3 — Policy-Level Validation
 
