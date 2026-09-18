@@ -1,38 +1,80 @@
-# Reinforcement Learning Trading Agents in a BSE Limit Order Book Environment
+# Reinforcement Learning Order Book Trading Agent
 
-**Studying Order Book Information Representation in Reinforcement Learning Trading Agents**
+**State Representation and Market Perception in a BSE Limit Order Book Environment**
 
-This project trains and evaluates a PPO-based RL trading agent in a simulated continuous double auction market based on the [Bristol Stock Exchange](https://github.com/davecliff/BristolStockExchange) (BSE) developed by Dave Cliff at the University of Bristol. The agent trades alongside BSE background traders (ZIC and ZIP) on the original BSE matching engine, rather than on a hand-crafted order book implementation.
+## Overview
+
+This project investigates how **market information and state representation affect the performance of reinforcement-learning trading agents** in a simulated limit order book.
+
+A PPO-based agent trades through the original **Bristol Stock Exchange (BSE)** matching engine alongside ZIC and ZIP background traders. Five state representations are evaluated, ranging from price-only and best bid/ask information to raw LOB depth, handcrafted microstructure features, and learned LOB encodings.
+
+The project focuses on whether richer market information necessarily improves trading performance, or whether appropriately structured representations allow the agent to use order-book information more effectively.
 
 ---
 
-## Project Structure
+## Results
 
-```
-rl_lob_project/
-├── main.py                             ← CLI entry point
-├── config.py                           ← MarketConfig / AgentConfig / ExperimentConfig
-├── trading_env.py                      ← Gymnasium trading environment
-├── rl_policy.py                        ← SB3 PPO factory + feature extractor
-├── visualization.py                    ← Metrics + plotting helpers
-├── market/
-│   ├── BSE.py                          ← Dave Cliff's BSE engine
-│   └── bse_market.py                   ← BSE integration layer
-├── outputs/
-│   ├── experiment1/                    ← Exp 1 results
-│   ├── experiment2/                    ← Exp 2 results
-│   └── experiment3/                    ← Exp 3 results
-├── representations/
-│   ├── state_builder.py                ← Observation builders
-│   └── encoders.py                     ← MLP / CNN / Autoencoder encoders
-├── requirements.txt
-│
-├── experiments/
-│   ├── runner.py                       ← Shared train / eval / baseline utilities
-│   ├── experiment1.py                  ← Exp 1: information level comparison
-│   ├── experiment2.py                  ← Exp 2: representation method comparison
-│   └── experiment3.py                  ← Exp 3: PPO agents vs non-learning baselines
-```
+### Experiment 1 — Market Information Level
+
+| State | Mean Total PnL | Sharpe |
+|:--|--:|--:|
+| Price Only | -312.15 | -0.09 |
+| Best Bid/Ask | **15.80** | 0.01 |
+| Raw LOB | -35.00 | 0.01 |
+
+Best bid/ask significantly outperformed price-only observations in both total PnL (**p = 0.0053**) and Sharpe ratio (**p = 0.0061**), while deeper raw LOB information did not provide a statistically significant improvement over top-of-book information.
+
+### Experiment 2 — LOB Representation
+
+The **handcrafted microstructure representation** achieved the highest mean Total PnL (**270.02**) and Sharpe ratio (**0.12**).
+
+It significantly outperformed all three learned encoder representations in Total PnL:
+
+- MLP encoder: **p = 0.0010**
+- CNN encoder: **p = 0.0002**
+- Autoencoder: **p = 0.0005**
+
+The advantage over best bid/ask was larger in mean PnL but was not statistically significant in this experiment (**p = 0.0745**).
+
+### Experiment 3 — Policy-Level Validation
+
+Under a denser and longer simulated market regime:
+
+| Agent | Mean Total PnL | Sharpe |
+|:--|--:|--:|
+| PPO — Handcrafted | **762.40** | **0.34** |
+| PPO — Best Bid/Ask | 455.70 | 0.19 |
+| Random Quoting | -37.48 | -0.04 |
+| Adaptive Quoting | -90.31 | -0.09 |
+| Rule-Based | 0.16 | 0.00 |
+
+The handcrafted PPO agent achieved approximately **67% higher mean PnL** than the best-bid/ask PPO agent, with the paired difference statistically significant (**p = 0.0356**).
+
+It also significantly outperformed all three non-learning baselines in Total PnL (**p < 0.0001**).
+
+---
+
+## Experimental Design
+
+The PPO agent uses five discrete actions:
+
+- Hold
+- Limit Buy
+- Limit Sell
+- Market Buy
+- Market Sell
+
+Five market-state representations are evaluated:
+
+- `price_only` — recent prices, returns, and volatility
+- `best_bidask` — top-of-book quotes, spread, and mid-price
+- `raw_lob` — multi-level bid/ask prices and quantities
+- `handcrafted` — engineered microstructure features such as spread, imbalance, depth, volatility, and micro-price deviation
+- `encoded` — learned LOB representations using MLP, CNN, or autoencoder encoders
+
+Every state also includes inventory, current PnL, and remaining episode time.
+
+The reward is centred on changes in mark-to-market PnL, with shaping terms for inventory exposure, transaction costs, inactivity, drawdown, recent PnL volatility, and trading activity.
 
 ---
 
@@ -40,14 +82,13 @@ rl_lob_project/
 
 The file `market/BSE.py` is based on Dave Cliff's Bristol Stock Exchange (BSE) simulator.
 
-The surrounding integration code, including `bse_market.py`, `trading_env.py`, state representations, experiment scripts and evaluation utilities, was developed for this coursework project.
+The surrounding integration code, including `bse_market.py`, `trading_env.py`, state representations, experiment scripts and evaluation utilities, was developed for this project.
 
 BSE repository: https://github.com/davecliff/BristolStockExchange
 
 The figure below summarises how the original BSE components are integrated into this project. The original BSE matching engine, public LOB and ZIC/ZIP background traders are used through the `BSEMarket` wrapper. The reinforcement-learning interface, state construction, reward calculation, accounting logic, PPO integration and experiment code are implemented around this BSE layer.
 
 ![Implementation structure](figures/implementation_structure.png)
-
 
 ---
 
@@ -99,7 +140,7 @@ python main.py --exp 3 --best_state_type handcrafted
 
 `Experiment 3` currently supports only `handcrafted`, `best_bidask`, or the default `both`.
 
-The full formal experiments can take a long time because each configuration is trained over multiple independent runs. The reported coursework results were generated using the formal experiment settings described in the report.
+The full formal experiments can take a long time because each configuration is trained over multiple independent runs. The reported experimental results were generated using the formal experiment settings described in the report.
 
 ### Representative saved model
 
@@ -140,3 +181,11 @@ Typical files include:
 The main configuration values are defined in `config.py`. Some experiment scripts override selected settings, such as training steps, episode length, market density, or evaluation episodes, to match the formal experiment settings used in the report.
 
 All compared methods within the same experiment use the same environment dynamics, action space, reward structure, accounting rules, inventory limits and evaluation protocol.
+
+---
+
+## Limitations
+
+- BSE is a controlled simulated market and does not model latency, hidden liquidity, institutional order flow, or multiple assets.
+- Results should be interpreted within the simulated BSE environment rather than as evidence of real-market profitability.
+- PPO training remains stochastic, and broader market regimes and larger numbers of seeds would strengthen robustness.
